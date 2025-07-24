@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # EGP Node
+  egp-node:
+    build: 
+      context: .
+      target: production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - IPFS_API_URL=http://ipfs:5001
+      - NODE_ID=egp-node-dev-001
+    depends_on:
+      ipfs:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # IPFS Node
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "4001:4001"    # P2P swarm
+      - "5001:5001"    # API
+      - "8080:8080"    # Gateway
+    environment:
+      - IPFS_PROFILE=server
+    volumes:
+      - ipfs_data:/data/ipfs
+      - ./config/ipfs:/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Development tools
+  egp-node-dev:
+    build:
+      context: .
+      target: builder
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - IPFS_API_URL=http://ipfs:5001
+      - NODE_ID=egp-node-dev-hot
+    depends_on:
+      ipfs:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    command: npm run dev
+    restart: unless-stopped
+    profiles:
+      - dev
+
+  # Testing environment
+  test:
+    build:
+      context: .
+      target: builder
+    environment:
+      - NODE_ENV=test
+      - LOG_LEVEL=error
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm test
+    profiles:
+      - test
+
+  # Mock server for testing
+  mock-server:
+    image: stoplight/prism:latest
+    ports:
+      - "4010:4010"
+    command: mock -h 0.0.0.0 -p 4010 /specs/openapi.yaml
+    volumes:
+      - ./docs/specs:/specs:ro
+    profiles:
+      - mock
+
+volumes:
+  ipfs_data:
+    driver: local
+
+networks:
+  default:
+    name: egp-network

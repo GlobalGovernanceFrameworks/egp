@@ -67,49 +67,158 @@ graph TB
 
 ## 🛠️ Getting Started
 
-### Quick Start: Test the API
+### Prerequisites
 
-Try the EGP protocol locally using our mock server and example data:
+- **Docker & Docker Compose** (recommended for quick start)
+- **Node.js 18+** (for local development)
+- **Git** for cloning the repository
+
+### Quick Start with Docker
+
+The fastest way to get EGP running is with Docker:
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/ggf/egp.git
 cd egp
 
-# Start the mock API server
-npx @stoplight/prism-cli mock docs/specs/openapi.yaml
-# Server will start at http://localhost:4010
+# 2. Start the EGP services (node + IPFS)
+docker-compose up
 
-# In another terminal, run the complete Hello World flow
+# This starts:
+# - EGP Node on http://localhost:3000
+# - IPFS node on http://localhost:5001 (API) and http://localhost:8080 (Gateway)
+```
+
+**Verify it's working:**
+```bash
+# Check EGP node health
+curl http://localhost:3000/health
+
+# Should return: {"status":"healthy", "timestamp":"...", ...}
+```
+
+### Run the Complete EGP Demo
+
+Once the services are running, test the full governance workflow:
+
+```bash
+# In a new terminal window
 cd examples/
 chmod +x egp_hello_world.sh
 ./egp_hello_world.sh
 ```
 
-This will demonstrate a complete `sense() → propose() → adopt()` cycle using a real-world scenario: a community garden water crisis resolved through traditional Indigenous knowledge.
+This demonstrates a complete `sense() → propose() → adopt()` cycle using a real-world scenario: a community garden water crisis resolved through traditional Indigenous knowledge.
 
-### Manual Testing
+### Manual API Testing
 
 You can also test individual endpoints:
 
 ```bash
 # 1. Flag a systemic issue
-curl -X POST http://localhost:4010/sense \
+curl -X POST http://localhost:3000/sense \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer did:key:test123" \
   -d @examples/sense.json
 
 # 2. Propose a solution
-curl -X POST http://localhost:4010/propose \
+curl -X POST http://localhost:3000/propose \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer did:key:test123" \
   -d @examples/propose.json
 
 # 3. Adopt as time-bound experiment
-curl -X POST http://localhost:4010/adopt \
+curl -X POST http://localhost:3000/adopt \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer did:key:test123" \
   -d @examples/adopt.json
+```
+
+-----
+
+## 🧪 Running Tests
+
+The EGP codebase includes comprehensive test suites for all protocol operations:
+
+```bash
+# Install dependencies (if not using Docker)
+npm install
+
+# Run all tests
+npm test
+
+# Run tests in watch mode (for development)
+npm run test:watch
+```
+
+**Test Coverage:**
+- ✅ **sense.test.js** - Signal validation, data enrichment, related signal detection
+- ✅ **propose.test.js** - Proposal validation, duration parsing, lifecycle management  
+- ✅ **adopt.test.js** - Adoption validation, monitoring setup, revocation conditions, learning archives
+
+**Example test output:**
+```
+ PASS  test/sense.test.js
+ PASS  test/propose.test.js  
+ PASS  test/adopt.test.js
+Test Suites: 3 passed, 3 total
+Tests:       26 passed, 26 total
+```
+
+-----
+
+## 🔧 Development Setup
+
+For those wanting to contribute to the core protocol:
+
+### Local Development (without Docker)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment
+cp .env.example .env
+# Edit .env with your IPFS and other configuration
+
+# 3. Start IPFS daemon (requires IPFS installed locally)
+ipfs daemon
+
+# 4. Start the EGP node in development mode
+npm run dev
+
+# 5. Run tests
+npm test
+```
+
+### Docker Development Environment
+
+For development with hot reloading:
+
+```bash
+# Start development services with file watching
+docker-compose --profile dev up
+
+# This starts:
+# - egp-node-dev with hot reload on http://localhost:3001
+# - IPFS node
+```
+
+### Additional Development Commands
+
+```bash
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+
+# Build Docker image manually
+docker build -t egp-node .
+
+# Run only tests in Docker
+docker-compose --profile test run test
 ```
 
 ### Understanding the Example
@@ -123,60 +232,103 @@ The provided example demonstrates:
 
 -----
 
-## 🔧 Development Setup
+## 🔧 Project Structure
 
-For those wanting to contribute to the core protocol:
-
-1.  **Explore the Protocol:**
-
-      * Read the **[full EGP Framework document](https://www.globalgovernanceframeworks.org/frameworks/emergent-governance-protocol)**.
-      * Check out the **[technical implementation appendix](https://globalgovernanceframeworks.org/frameworks/emergent-governance-protocol#egp-appendix)**.
-      * Review the **[OpenAPI specification](docs/specs/openapi.yaml)**.
-
-2.  **Join the Conversation:**
-
-      * Join our **[Discord server](https://discord.gg/MjnzCfh4mM)** to meet the community and discuss the technical vision.
-      * Introduce yourself in the `#introductions` channel.
-
-3.  **Development Environment:**
-
-```bash
-# Install dependencies
-npm install
-
-# Run tests (coming soon)
-npm test
-
-# Lint the OpenAPI spec
-npm run lint:api
-
-# Generate documentation (coming soon)
-npm run docs
+```
+egp/
+├── src/
+│   ├── index.js              # Main server entry point
+│   ├── sense.js              # sense() endpoint handler
+│   ├── propose.js            # propose() endpoint handler
+│   ├── adopt.js              # adopt() endpoint handler
+│   └── lib/
+│       └── ipfs.js           # IPFS integration
+├── test/
+│   ├── sense.test.js         # sense() protocol tests
+│   ├── propose.test.js       # propose() protocol tests
+│   └── adopt.test.js         # adopt() protocol tests
+├── docs/
+│   ├── specs/
+│   │   ├── openapi.yaml      # Main API specification
+│   │   ├── sense.md          # Detailed sense() documentation
+│   │   ├── propose.md        # Detailed propose() documentation
+│   │   └── adopt.md          # Detailed adopt() documentation
+│   └── ai-conversations/     # Development discussions
+├── examples/
+│   ├── sense.json           # Example sense() payload
+│   ├── propose.json         # Example propose() payload
+│   ├── adopt.json           # Example adopt() payload
+│   └── egp_hello_world.sh   # Complete workflow demonstration
+├── docker-compose.yml       # Multi-service Docker setup
+├── Dockerfile               # EGP node container definition
+├── package.json             # Node.js dependencies and scripts
+├── jest.config.js           # Test configuration
+├── README.md                # This file
+├── CONTRIBUTING.md          # Contribution guidelines
+└── CODE_OF_CONDUCT.md       # Community standards
 ```
 
 -----
 
-## 📁 Project Structure
+## 🚨 Troubleshooting
 
+### Docker Issues
+
+**Services won't start:**
+```bash
+# Force rebuild without cache
+docker-compose build --no-cache
+docker-compose up
 ```
-egp/
-├── docs/
-│   ├── specs/
-│   │   ├── openapi.yaml       # Main API specification
-│   │   ├── sense.md           # Detailed sense() documentation
-│   │   ├── propose.md         # Detailed propose() documentation
-│   │   └── adopt.md           # Detailed adopt() documentation
-│   └── ai-conversations/      # Development discussions
-├── examples/
-│   ├── sense.json            # Example sense() payload
-│   ├── propose.json          # Example propose() payload
-│   ├── adopt.json            # Example adopt() payload
-│   └── egp_hello_world.sh    # Complete workflow demonstration
-├── scripts/
-│   └── test-egp.js           # Test utilities
-├── README.md                 # This file
-├── CONTRIBUTING.md           # Contribution guidelines
-└── CODE_OF_CONDUCT.md       # Community standards
+
+**IPFS connection issues:**
+```bash
+# Check IPFS logs
+docker-compose logs ipfs
+
+# Restart IPFS service
+docker-compose restart ipfs
+```
+
+**Port conflicts:**
+```bash
+# Check what's using the ports
+lsof -i :3000
+lsof -i :5001
+
+# Stop conflicting services or change ports in docker-compose.yml
+```
+
+### Test Issues
+
+**ES Module errors:**
+```bash
+# Ensure you're using Node.js 18+
+node --version
+
+# Check that package.json has "type": "module"
+grep '"type"' package.json
+```
+
+**IPFS connection in tests:**
+```bash
+# Tests run against the actual IPFS node, ensure it's running
+curl http://localhost:5001/api/v0/version
+```
+
+### Common Development Issues
+
+**Hot reload not working:**
+```bash
+# Use the dev profile for file watching
+docker-compose --profile dev up egp-node-dev
+```
+
+**Permission issues with Docker:**
+```bash
+# On Linux, you might need to add your user to the docker group
+sudo usermod -aG docker $USER
+# Then log out and log back in
 ```
 
 -----
