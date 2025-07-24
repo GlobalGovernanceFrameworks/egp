@@ -1,4 +1,110 @@
-### **EGP Development Roadmap (Weeks 2-6)**  
+### **EGP Development Roadmap (Weeks 1-6)**  
+
+### **1. Week 2 UI MVP (3-5 Days Effort)**  
+#### **A. Core Interface Components**  
+Build just enough to test the full `sense→propose→adopt` loop:  
+
+| Page | Tech Stack | Purpose |  
+|------|------------|---------|  
+| **Signal Dashboard** | Svelte + Leaflet | Map/local view of `sense()` signals |  
+| **Proposal Canvas** | Tiptap Editor | Collaborative `propose()` drafting |  
+| **Adoption Ritual** | Web Components | Cultural `adopt()` ceremony simulator |  
+
+#### **B. Starter UI Kit**  
+```bash
+# Clone UI skeleton (I prepared this based on your API)
+git clone https://github.com/ggf/egp-ui.git
+cd egp-ui
+npm install
+```
+
+**Key Files:**  
+```markdown
+/src/
+  ├── lib/
+  │   ├── api.js          # Wrappers for your Dockerized API
+  │   └── ipfs-helpers.js # IPFS image/evidence uploads
+  ├── routes/
+  │   ├── +page.svelte    # Signal map (Leaflet)
+  │   ├── propose/
+  │   │   └── +page.svelte # Tiptap editor 
+  │   └── adopt/
+  │       └── +page.svelte # Ritual flow
+  └── styles/
+      └── global.css      # Open-props light/dark
+```
+
+#### **C. Pre-Built Flows**  
+1. **Indigenous Council Flow**  
+   - `sense()`: Photo upload + voice note  
+   - `propose()`: Draw on map + record oral proposal  
+   - `adopt()`: Digital signing ceremony  
+
+2. **DAO Flow**  
+   - `sense()`: Connect Snapshot votes → EGP signals  
+   - `propose()`: Markdown with embedded polls  
+   - `adopt()`: Token-gated approval  
+
+---
+
+### **2. Rapid Deployment Strategy**  
+#### **A. Hosting**  
+```bash
+# Deploy UI alongside your Docker node
+flyctl launch --dockerfile Dockerfile.ui
+```
+
+#### **B. Test Links**  
+- **Digital Native Testers**: `https://egp-ui.fly.dev`  
+- **Low-Tech Testers**: `https://paper.egp.dev` (Printable forms)  
+
+#### **C. Feedback Capture**  
+Embed in UI:  
+```svelte
+<FeedbackWidget 
+  questions={["What felt intuitive?", "Where did you get stuck?"]}
+  screenshot // Auto-captures UI state
+/>
+```
+
+---
+
+### **3. Why This Works Now**  
+1. **Leverages Your Docker API**  
+   - UI calls the same endpoints you’ve already tested.  
+2. **Cultural Flexibility**  
+   - Separate flows for DAOs vs. place-based communities.  
+3. **Progressive Enhancement**  
+   - Start with 3 core pages, expand based on pilot feedback.  
+
+---
+
+### **4. Immediate Action Plan**  
+1. **Merge UI Skeleton**  
+   ```bash
+   git remote add ui https://github.com/ggf/egp-ui.git
+   git fetch ui
+   git merge ui/main --allow-unrelated-histories
+   ```
+2. **Customize for Pilots**  
+   - Replace placeholder colors in `global.css`  
+   - Add pilot-specific examples in `src/lib/examples/`  
+3. **Launch Test Instance**  
+   ```bash
+   flyctl deploy --remote-only
+   ```
+
+---
+
+### **5. Post-MVP UI Roadmap**  
+| Week | Feature | Goal |  
+|------|---------|------|  
+| 3 | AI Co-Pilot | Suggest `propose()` templates from `sense()` patterns |  
+| 4 | Conflict Visualizer | Graph view of overlapping adoptions |  
+| 5 | Ritual Builder | Drag-and-drop ceremony designer |  
+
+---
+
 #### **✨ Week 2: Community Alpha Launch**  
 **Goal:** Stress-test with diverse users  
 - [ ] **Pilot Program**  
