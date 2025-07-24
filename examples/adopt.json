@@ -1,0 +1,26 @@
+{
+  "proposal_uri": "/propose/bafkrei...",
+  "decision_process": {
+    "type": "elder_council",
+    "record": "ceremony:new_moon_water_blessing_2025_07_24",
+    "participants": ["Rosa_water_keeper", "Carlos_young_farmer_rep", "Maria_family_delegate"],
+    "unanimous_consent": true,
+    "spiritual_validation": "Water ceremony performed, ancestors consulted, dreams were favorable"
+  },
+  "modifications": {
+    "sunset": "P4M",
+    "test": "Garden produces 75% of normal harvest with 50% less water. Zero water conflicts. 3 youth certified in traditional methods.",
+    "cultural_additions": "Include monthly full-moon water gratitude ceremony. Document elder knowledge in Kunza language."
+  },
+  "monitoring": {
+    "who": ["water_council", "youth_learners", "elder_rosa", "sensor_collective"],
+    "frequency": "P2W",
+    "metrics": [
+      "well_depth_measurements",
+      "plant_health_scores", 
+      "community_harmony_index",
+      "traditional_knowledge_transmission_rate"
+    ],
+    "reporting_format": "Monthly storytelling circle + digital data dashboard"
+  }
+}

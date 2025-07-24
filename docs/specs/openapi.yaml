@@ -1,26 +1,74 @@
 # docs/specs/openapi.yaml
+openapi: 3.0.3
+info:
+  title: Emergent Governance Protocol API
+  description: |
+    The minimum viable grammar for governance coordination.
+    Three simple verbs: sense(), propose(), adopt().
+  version: 0.1.0-alpha
+  contact:
+    name: EGP Community
+    url: https://egp.org
+    email: hello@globalgovernanceframeworks.org
+  license:
+    name: CC BY-SA 4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+
+servers:
+  - url: http://localhost:4010
+    description: Local mock server
+  - url: https://api.egp.org/v1
+    description: Production API
+
 paths:
   /sense:
     post:
       summary: File a systemic signal
+      description: |
+        The art of noticing. Submit a distress signal, love letter, or data pulse
+        to flag systemic opportunities or problems.
+      tags:
+        - Sensing
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SenseInput"
+            example:
+              issue: "water_shortage"
+              title: "The well is dry"
+              scope: "village:llajta"
+              evidence:
+                sensor_data: "pH 9.2"
+                oral_history: "Elder María says this hasn't happened in 70 years"
+              urgency: "3/5"
+              tags: ["water", "climate", "indigenous_knowledge"]
       responses:
         201:
-          description: Created
+          description: Signal created successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SenseOutput"
+          headers:
+            Location:
+              description: URI of the new sense signal
+              schema:
+                type: string
+                example: "/sense/123"
+        400:
+          description: Invalid input
+        403:
+          description: Unauthorized (invalid/missing DID token)
+
   /propose:
     post:
       summary: Submit a solution proposal
       description: |
-        Anyone (human, AI, or institution) can propose a response to a `sense()` signal.
-        Proposals are time-bound experiments with clear success metrics.
+        The art of offering. Anyone (human, AI, or institution) can propose 
+        a response to a sense() signal. Proposals are time-bound experiments 
+        with clear success metrics.
       tags:
         - Proposals
       requestBody:
@@ -29,7 +77,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ProposeInput"
-            example:  # Mirror your vibe-draft
+            example:
               title: "Moonlight Water Sharing"
               in_response_to: "/sense/123"
               solution:
@@ -58,12 +106,16 @@ paths:
           description: Invalid input (e.g., missing `in_response_to`)
         403:
           description: Unauthorized (invalid/missing DID token)
+        404:
+          description: Referenced sense signal not found
+
   /adopt:
     post:
       summary: Adopt a proposal as time-bound experiment
       description: |
-        A community or institution adopts a proposal as a temporary commitment.
-        This creates a time-bound experiment with monitoring and success criteria.
+        The art of temporary commitment. A community or institution adopts 
+        a proposal as a temporary commitment, creating a time-bound experiment 
+        with monitoring and success criteria.
       tags:
         - Adoptions
       requestBody:
@@ -102,6 +154,7 @@ paths:
           description: Unauthorized (invalid/missing DID token)
         404:
           description: Proposal not found
+
 components:
   schemas:
     SenseInput:
@@ -110,13 +163,75 @@ components:
       properties:
         issue:
           type: string
+          description: Machine-readable issue ID
           example: "water_shortage"
+        title:
+          type: string
+          description: Human-readable title
+          example: "The well is dry"
         scope:
           type: string
+          description: GPS, bioregion, or community ID
           example: "village:llajta"
         evidence:
           type: object
+          description: Flexible proof of the issue
           additionalProperties: true
+          example:
+            sensor_data: "pH 9.2"
+            oral_history: "Elder María says this hasn't happened in 70 years"
+        urgency:
+          type: string
+          description: Urgency level (1=chronic, 5=catastrophic)
+          example: "3/5"
+        tags:
+          type: array
+          items:
+            type: string
+          description: Searchable tags
+          example: ["water", "climate", "indigenous_knowledge"]
+
+    SenseOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Content-addressed ID (IPFS CID)
+          example: "bafyrei..."
+        timestamp:
+          type: string
+          format: date-time
+          description: When the sense signal was created
+          example: "2025-07-24T12:34:56Z"
+        relates_to:
+          type: array
+          items:
+            type: string
+            format: uri-reference
+          description: URIs of related sense signals
+          example: ["/sense/101"]
+        echoes:
+          type: integer
+          description: Number of similar sense calls nearby
+          example: 42
+        actions:
+          type: object
+          description: Suggested next steps and related resources
+          properties:
+            propose_template:
+              type: string
+              format: uri-reference
+              description: Pre-filled proposal template
+              example: "/propose?from_sense=123"
+            local_healers:
+              type: string
+              format: uri-reference
+              description: Relevant people or resources
+              example: "/people?skills=water_rituals"
+          additionalProperties:
+            type: string
+            description: Other contextual actions or resources
+
     ProposeInput:
       type: object
       required:
@@ -132,7 +247,7 @@ components:
           example: "Moonlight Water Sharing"
         in_response_to:
           type: string
-          description: URI of the `sense()` call this addresses
+          description: URI of the sense() call this addresses
           format: uri-reference
           example: "/sense/123"
         solution:
@@ -173,6 +288,7 @@ components:
               items:
                 type: string
               example: ["land_access", "elders_council"]
+
     ProposeOutput:
       type: object
       properties:
@@ -205,6 +321,7 @@ components:
             offering_required:
               type: string
               example: "tobacco_bundle"
+
     AdoptInput:
       type: object
       required:
@@ -303,3 +420,27 @@ components:
           type: string
           description: IPFS URI for shared learning documentation
           example: "/ipfs/QmLearn..."
+
+  securitySchemes:
+    DID_Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: DID
+      description: Decentralized Identifier (DID) token
+    UCAN_Bearer:
+      type: http
+      scheme: bearer  
+      bearerFormat: UCAN
+      description: User Controlled Authorization Network token
+
+security:
+  - DID_Bearer: []
+  - UCAN_Bearer: []
+
+tags:
+  - name: Sensing
+    description: The art of noticing - detecting systemic signals
+  - name: Proposals
+    description: The art of offering - suggesting solutions
+  - name: Adoptions
+    description: The art of temporary commitment - implementing experiments

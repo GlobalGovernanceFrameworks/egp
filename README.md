@@ -67,34 +67,116 @@ graph TB
 
 ## 🛠️ Getting Started
 
-We are in the early stages of development. The first step is defining the core data schemas.
+### Quick Start: Test the API
+
+Try the EGP protocol locally using our mock server and example data:
+
+```bash
+# Clone the repository
+git clone https://github.com/ggf/egp.git
+cd egp
+
+# Start the mock API server
+npx @stoplight/prism-cli mock docs/specs/openapi.yaml
+# Server will start at http://localhost:4010
+
+# In another terminal, run the complete Hello World flow
+cd examples/
+chmod +x egp_hello_world.sh
+./egp_hello_world.sh
+```
+
+This will demonstrate a complete `sense() → propose() → adopt()` cycle using a real-world scenario: a community garden water crisis resolved through traditional Indigenous knowledge.
+
+### Manual Testing
+
+You can also test individual endpoints:
+
+```bash
+# 1. Flag a systemic issue
+curl -X POST http://localhost:4010/sense \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer did:key:test123" \
+  -d @examples/sense.json
+
+# 2. Propose a solution
+curl -X POST http://localhost:4010/propose \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer did:key:test123" \
+  -d @examples/propose.json
+
+# 3. Adopt as time-bound experiment
+curl -X POST http://localhost:4010/adopt \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer did:key:test123" \
+  -d @examples/adopt.json
+```
+
+### Understanding the Example
+
+The provided example demonstrates:
+- **Cultural Integration**: Traditional Atacameño water management + modern efficiency
+- **Multi-Modal Evidence**: Sensor data + elder knowledge + community impact
+- **Ceremonial Decision-Making**: Elder council with spiritual validation
+- **Time-Bound Experimentation**: 4-month trial with 2-week monitoring cycles
+- **Knowledge Transmission**: Youth apprenticeships in traditional techniques
+
+-----
+
+## 🔧 Development Setup
+
+For those wanting to contribute to the core protocol:
 
 1.  **Explore the Protocol:**
 
       * Read the **[full EGP Framework document](https://www.globalgovernanceframeworks.org/frameworks/emergent-governance-protocol)**.
       * Check out the **[technical implementation appendix](https://globalgovernanceframeworks.org/frameworks/emergent-governance-protocol#egp-appendix)**.
+      * Review the **[OpenAPI specification](docs/specs/openapi.yaml)**.
 
 2.  **Join the Conversation:**
 
       * Join our **[Discord server](https://discord.gg/MjnzCfh4mM)** to meet the community and discuss the technical vision.
       * Introduce yourself in the `#introductions` channel.
 
-3.  **Make Your First Contribution:**
-
-      * The core schemas are the first piece of the puzzle. You can contribute by reviewing the proposed schemas and suggesting improvements.
-      * Check out the **[open issues](https://github.com/GlobalGovernanceFrameworks/egp/issues)**, especially those tagged with `good first issue`.
+3.  **Development Environment:**
 
 ```bash
-# Example: Clone the schema repository and get started
-git clone [https://github.com/ggf/egp.git](https://github.com/ggf/egp.git)
-cd egp
-
-# Explore the proposed data schemas (coming soon)
-ls schemas/
-
-# Run the local test suite (coming soon)
+# Install dependencies
 npm install
+
+# Run tests (coming soon)
 npm test
+
+# Lint the OpenAPI spec
+npm run lint:api
+
+# Generate documentation (coming soon)
+npm run docs
+```
+
+-----
+
+## 📁 Project Structure
+
+```
+egp/
+├── docs/
+│   ├── specs/
+│   │   ├── openapi.yaml       # Main API specification
+│   │   ├── sense.md           # Detailed sense() documentation
+│   │   ├── propose.md         # Detailed propose() documentation
+│   │   └── adopt.md           # Detailed adopt() documentation
+│   └── ai-conversations/      # Development discussions
+├── examples/
+│   ├── sense.json            # Example sense() payload
+│   ├── propose.json          # Example propose() payload
+│   ├── adopt.json            # Example adopt() payload
+│   └── egp_hello_world.sh    # Complete workflow demonstration
+├── scripts/
+│   └── test-egp.js           # Test utilities
+├── README.md                 # This file
+├── CONTRIBUTING.md           # Contribution guidelines
+└── CODE_OF_CONDUCT.md       # Community standards
 ```
 
 -----

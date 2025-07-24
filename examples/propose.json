@@ -1,0 +1,15 @@
+{
+  "title": "Moonlight Irrigation & Ancient Terracing Revival",
+  "in_response_to": "/sense/bafyrei...",
+  "solution": {
+    "description": "Combine night irrigation (reduces evaporation 40%) with restoring traditional Atacameño water terraces. Use buried clay pots (ollas) for slow-release watering.",
+    "format": "text/markdown",
+    "content": "## Solution Overview\n\n### Phase 1: Immediate Relief (Week 1-2)\n- Schedule irrigation between 10pm-4am when evaporation is minimal\n- Install shade cloth over most vulnerable plants\n- Implement water rationing: 2L per family plot per day\n\n### Phase 2: Traditional Revival (Month 1-3)\n- Work with elders to map original terrace locations\n- Rebuild 3 key terraces using traditional stone-laying techniques\n- Install 20 buried clay ollas for efficient water storage\n\n### Phase 3: Community Resilience (Month 3-6)\n- Train 5 young people in traditional water management\n- Create seed bank for drought-resistant native varieties\n- Establish water council with rotating leadership\n\n![Terrace sketch](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)"
+  },
+  "test": "Garden produces 80% of normal harvest despite 60% less water. Community conflict over water drops to zero. At least 3 youth learn traditional techniques.",
+  "sunset": "P6M",
+  "resources": {
+    "needed": ["clay_pots", "shade_cloth", "hand_tools", "elder_knowledge_holders"],
+    "offered": ["young_volunteer_labor", "traditional_stone_quarry_access", "community_meeting_space", "monthly_follow_up_commitment"]
+  }
+}
