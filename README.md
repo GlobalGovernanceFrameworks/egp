@@ -43,7 +43,7 @@ graph TB
     G --> B
     G --> C
     G --> D
-````
+```
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -71,20 +71,18 @@ We are in the early stages of development. The first step is defining the core d
 
 1.  **Explore the Protocol:**
 
-      * Read the **[full EGP Framework document](https://www.google.com/search?q=link-to-full-framework.md)**.
-      * Check out the **[technical implementation appendix](https://www.google.com/search?q=link-to-appendix.md)**.
+      * Read the **[full EGP Framework document](https://www.globalgovernanceframeworks.org/frameworks/emergent-governance-protocol)**.
+      * Check out the **[technical implementation appendix](https://globalgovernanceframeworks.org/frameworks/emergent-governance-protocol#egp-appendix)**.
 
 2.  **Join the Conversation:**
 
-      * Join our **[Discord server](https://www.google.com/search?q=link-to-discord)** to meet the community and discuss the technical vision.
+      * Join our **[Discord server](https://discord.gg/MjnzCfh4mM)** to meet the community and discuss the technical vision.
       * Introduce yourself in the `#introductions` channel.
 
 3.  **Make Your First Contribution:**
 
       * The core schemas are the first piece of the puzzle. You can contribute by reviewing the proposed schemas and suggesting improvements.
-      * Check out the **[open issues](https://www.google.com/search?q=link-to-issues)**, especially those tagged with `good first issue`.
-
-<!-- end list -->
+      * Check out the **[open issues](https://github.com/GlobalGovernanceFrameworks/egp/issues)**, especially those tagged with `good first issue`.
 
 ```bash
 # Example: Clone the schema repository and get started
@@ -110,7 +108,7 @@ This is an open, collaborative project. We need thinkers and builders of all kin
   * **Governance Theorists**: To help refine the logic and principles of the protocol.
   * **Community Organizers**: To help us pilot the EGP in real-world communities.
 
-Please read our **[Contribution Guidelines](https://www.google.com/search?q=CONTRIBUTING.md)** to get started.
+Please read our **[Contribution Guidelines](CONTRIBUTING.md)** to get started.
 
 -----
 
