@@ -1,0 +1,305 @@
+# docs/specs/openapi.yaml
+paths:
+  /sense:
+    post:
+      summary: File a systemic signal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SenseInput"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SenseOutput"
+  /propose:
+    post:
+      summary: Submit a solution proposal
+      description: |
+        Anyone (human, AI, or institution) can propose a response to a `sense()` signal.
+        Proposals are time-bound experiments with clear success metrics.
+      tags:
+        - Proposals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProposeInput"
+            example:  # Mirror your vibe-draft
+              title: "Moonlight Water Sharing"
+              in_response_to: "/sense/123"
+              solution:
+                description: "Farmers take turns at night to reduce evaporation"
+                format: "text/markdown"
+                content: "![Moonlit irrigation sketch](...)"
+              test: "Conflict drops 20% in 2mo"
+              sunset: "P6M"
+              resources:
+                needed: ["jugs", "volunteers"]
+                offered: ["land_access", "elders_council"]
+      responses:
+        201:
+          description: Proposal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProposeOutput"
+          headers:
+            Location:
+              description: URI of the new proposal
+              schema:
+                type: string
+                example: "/propose/456"
+        400:
+          description: Invalid input (e.g., missing `in_response_to`)
+        403:
+          description: Unauthorized (invalid/missing DID token)
+  /adopt:
+    post:
+      summary: Adopt a proposal as time-bound experiment
+      description: |
+        A community or institution adopts a proposal as a temporary commitment.
+        This creates a time-bound experiment with monitoring and success criteria.
+      tags:
+        - Adoptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdoptInput"
+            example:
+              proposal_uri: "/propose/456"
+              decision_process:
+                type: "consent"
+                record: "QmXyZ..."
+              modifications:
+                sunset: "P3M"
+                test: "Conflict drops 10%"
+              monitoring:
+                who: ["water_council", "youth_group"]
+                frequency: "P1W"
+      responses:
+        201:
+          description: Adoption created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdoptOutput"
+          headers:
+            Location:
+              description: URI of the new adoption
+              schema:
+                type: string
+                example: "/adopt/789"
+        400:
+          description: Invalid input (e.g., invalid proposal_uri)
+        403:
+          description: Unauthorized (invalid/missing DID token)
+        404:
+          description: Proposal not found
+components:
+  schemas:
+    SenseInput:
+      type: object
+      required: [issue, scope]
+      properties:
+        issue:
+          type: string
+          example: "water_shortage"
+        scope:
+          type: string
+          example: "village:llajta"
+        evidence:
+          type: object
+          additionalProperties: true
+    ProposeInput:
+      type: object
+      required:
+        - title
+        - in_response_to
+        - solution
+        - test
+        - sunset
+      properties:
+        title:
+          type: string
+          description: Human-readable name
+          example: "Moonlight Water Sharing"
+        in_response_to:
+          type: string
+          description: URI of the `sense()` call this addresses
+          format: uri-reference
+          example: "/sense/123"
+        solution:
+          type: object
+          required:
+            - description
+            - format
+          properties:
+            description:
+              type: string
+              example: "Farmers take turns at night"
+            format:
+              type: string
+              description: MIME type of the solution content
+              example: "text/markdown"
+            content:
+              type: string
+              description: Base64-encoded if binary
+              example: "![sketch](data:image/png;base64,...)"
+        test:
+          type: string
+          description: Success criteria (human or machine-readable)
+          example: "Conflict drops 20% in 2mo"
+        sunset:
+          type: string
+          description: ISO 8601 duration until auto-expiry
+          example: "P6M"
+        resources:
+          type: object
+          properties:
+            needed:
+              type: array
+              items:
+                type: string
+              example: ["jugs", "volunteers"]
+            offered:
+              type: array
+              items:
+                type: string
+              example: ["land_access", "elders_council"]
+    ProposeOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Content-addressed ID (IPFS CID)
+          example: "bafkrei..."
+        echoes:
+          type: integer
+          description: Similar proposals in this context
+          example: 5
+        conflicts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "/propose/101"
+              reason:
+                type: string
+                example: "overlaps_land_use"
+        rituals:
+          type: object
+          description: Cultural protocols for adoption
+          properties:
+            consent_process:
+              type: string
+              example: "/rituals/water_council"
+            offering_required:
+              type: string
+              example: "tobacco_bundle"
+    AdoptInput:
+      type: object
+      required:
+        - proposal_uri
+        - decision_process
+      properties:
+        proposal_uri:
+          type: string
+          description: URI of the proposal being adopted
+          format: uri-reference
+          example: "/propose/456"
+        decision_process:
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              description: Type of decision-making process used
+              enum: ["consent", "majority", "elder_council", "token_vote", "oral_tradition"]
+              example: "consent"
+            record:
+              type: string
+              description: IPFS hash or other reference to decision record
+              example: "QmXyZ..."
+        modifications:
+          type: object
+          description: Optional modifications to the original proposal
+          properties:
+            sunset:
+              type: string
+              description: Modified duration (ISO 8601)
+              example: "P3M"
+            test:
+              type: string
+              description: Adjusted success metric
+              example: "Conflict drops 10%"
+        monitoring:
+          type: object
+          description: Monitoring plan for the adoption
+          properties:
+            who:
+              type: array
+              items:
+                type: string
+              description: Groups responsible for monitoring
+              example: ["water_council", "youth_group"]
+            frequency:
+              type: string
+              description: How often to check progress (ISO 8601 duration)
+              example: "P1W"
+
+    AdoptOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Content-addressed ID (IPFS CID)
+          example: "bafy..."
+        trial_period:
+          type: object
+          properties:
+            starts:
+              type: string
+              format: date
+              example: "2025-08-01"
+            ends:
+              type: string
+              format: date
+              example: "2025-11-01"
+            review_at:
+              type: array
+              items:
+                type: string
+                format: date
+              description: Scheduled check-in dates
+              example: ["2025-09-01", "2025-10-01"]
+        revocation_conditions:
+          type: array
+          items:
+            type: object
+            properties:
+              if:
+                type: string
+                description: Condition that triggers revocation
+                example: "conflict > 30%"
+              then:
+                type: string
+                description: Action to take
+                example: "auto_revert"
+              recorded_by:
+                type: string
+                description: Who/what monitors this condition
+                example: "sensor:water_disputes"
+        learning_archive:
+          type: string
+          description: IPFS URI for shared learning documentation
+          example: "/ipfs/QmLearn..."
