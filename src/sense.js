@@ -1,6 +1,10 @@
 import Joi from 'joi';
 import { storeData, pinData, searchGovernanceObjects } from './lib/ipfs.js';
 import { createLogger, transports } from 'winston';
+import { senseSchema, validateUnified } from '@bjornkennethholmstrom/ggf-core';
+
+// Use for documentation or testing
+console.log('Using EGP schema from ggf-core:', senseSchema.title);
 
 const logger = createLogger({
   level: 'info',
