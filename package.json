@@ -25,6 +25,7 @@
   "author": "EGP Community",
   "license": "CC-BY-SA-4.0",
   "dependencies": {
+    "@bjornkennethholmstrom/ggf-core": "^0.1.1",
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "helmet": "^7.1.0",
